@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Use Case Discovery Workshop – OTC 1P</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --ml-yellow: #FFE600;
+    --ml-blue: #3483FA;
+    --ml-dark: #1a1a2e;
+    --ml-dark2: #16213e;
+    --ml-mid: #0f3460;
+    --ml-accent: #FFE600;
+    --ml-white: #ffffff;
+    --ml-gray: #f5f5f5;
+    --ml-text: #1a1a2e;
+    --ml-muted: #6b7280;
+    --ml-green: #00a650;
+    --ml-red: #e74c3c;
+    --radius: 16px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f8;
+    color: var(--ml-text);
+    min-height: 100vh;
+  }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: var(--ml-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+  .toolbar-brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .toolbar-brand .logo-box {
+    width: 36px; height: 36px;
+    background: var(--ml-yellow);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900; font-size: 14px;
+    color: var(--ml-dark);
+  }
+  .toolbar-brand span {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ml-white);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .toolbar-actions {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary {
+    background: var(--ml-yellow);
+    color: var(--ml-dark);
+  }
+  .btn-primary:hover { background: #f0d800; transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--ml-white);
+    border: 1.5px solid rgba(255,255,255,0.3);
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); }
+  .btn-blue {
+    background: var(--ml-blue);
+    color: white;
+  }
+  .btn-blue:hover { background: #2769e0; transform: translateY(-1px); }
+  .edit-mode-badge {
+    display: none;
+    background: #FFE600;
+    color: var(--ml-dark);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .edit-mode-badge.active { display: block; }
+
+  /* ===== MAIN LAYOUT ===== */
+  .page-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 20px 60px;
+  }
+
+  /* ===== COVER ===== */
+  .cover {
+    background: var(--ml-dark);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 28px;
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 48px;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(52,131,250,0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,230,0,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cover-eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .tag {
+    background: var(--ml-yellow);
+    color: var(--ml-dark);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .tag-blue {
+    background: var(--ml-blue);
+    color: white;
+  }
+  .cover-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 36px;
+    color: var(--ml-white);
+    line-height: 1.1;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+  }
+  .cover-title span { color: var(--ml-yellow); }
+  .cover-subtitle {
+    color: rgba(255,255,255,0.65);
+    font-size: 16px;
+    font-weight: 300;
+    max-width: 560px;
+    line-height: 1.6;
+    position: relative; z-index: 1;
+  }
+  .cover-meta {
+    display: flex; gap: 24px; margin-top: 28px;
+    position: relative; z-index: 1;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 50px;
+    padding: 6px 16px;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+  }
+  .meta-pill svg { flex-shrink: 0; }
+
+  /* ===== SECTION CARDS ===== */
+  .section-card {
+    background: var(--ml-white);
+    border-radius: var(--radius);
+    padding: 36px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+  .section-card.editing {
+    border-color: var(--ml-yellow);
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 12px;
+  }
+  .section-number {
+    width: 40px; height: 40px;
+    background: var(--ml-dark);
+    color: var(--ml-yellow);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .section-title-group { flex: 1; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ml-blue);
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--ml-dark);
+    line-height: 1.3;
+  }
+  .section-duration {
+    background: #f0f4ff;
+    color: var(--ml-blue);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .edit-icon-btn {
+    display: none;
+    width: 32px; height: 32px;
+    background: var(--ml-gray);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .edit-icon-btn:hover { background: var(--ml-yellow); }
+  body.edit-mode .edit-icon-btn { display: flex; }
+
+  /* Editable content */
+  .editable {
+    outline: none;
+    transition: background 0.2s, padding 0.2s;
+    border-radius: 6px;
+  }
+  body.edit-mode .editable:hover {
+    background: #fffde7;
+    padding: 2px 4px;
+  }
+  body.edit-mode .editable:focus {
+    background: #fffde7;
+    padding: 2px 4px;
+    box-shadow: 0 0 0 2px var(--ml-yellow);
+  }
+
+  /* ===== AGENDA TIMELINE ===== */
+  .agenda-timeline { display: flex; flex-direction: column; gap: 0; }
+  .agenda-item {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+  .agenda-item:last-child .agenda-line { display: none; }
+  .agenda-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48px;
+    flex-shrink: 0;
+  }
+  .agenda-dot {
+    width: 20px; height: 20px;
+    background: var(--ml-yellow);
+    border: 3px solid var(--ml-dark);
+    border-radius: 50%;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .agenda-line {
+    width: 2px;
+    flex: 1;
+    background: #e5e7eb;
+    margin: 4px 0;
+    min-height: 24px;
+  }
+  .agenda-content {
+    flex: 1;
+    padding: 2px 0 24px 16px;
+  }
+  .agenda-time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ml-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .agenda-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ml-dark);
+    margin-bottom: 4px;
+  }
+  .agenda-desc {
+    font-size: 13px;
+    color: var(--ml-muted);
+    line-height: 1.5;
+  }
+
+  /* ===== KPI SNAPSHOT ===== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: var(--ml-dark);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .kpi-value {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ml-yellow);
+    margin-bottom: 4px;
+  }
+  .kpi-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .celonis-note {
+    background: #f0f4ff;
+    border-left: 4px solid var(--ml-blue);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--ml-mid);
+    line-height: 1.6;
+  }
+
+  /* ===== PAINS MATRIX ===== */
+  .pains-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .pain-card {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+  }
+  .pain-card.high { border-color: var(--ml-red); background: #fff5f5; }
+  .pain-card.med { border-color: #f59e0b; background: #fffbeb; }
+  .pain-card.low { border-color: var(--ml-green); background: #f0fdf4; }
+  .pain-priority {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .pain-card.high .pain-priority { color: var(--ml-red); }
+  .pain-card.med .pain-priority { color: #f59e0b; }
+  .pain-card.low .pain-priority { color: var(--ml-green); }
+  .pain-title { font-weight: 600; font-size: 14px; color: var(--ml-dark); margin-bottom: 6px; }
+  .pain-desc { font-size: 13px; color: var(--ml-muted); line-height: 1.5; }
+
+  /* ===== HACKATHON SQUAD (single) ===== */
+  .squad-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 28px;
+  }
+  .squad-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .squad-badge {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: #eff6ff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .squad-name { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 16px; color: var(--ml-dark); }
+  .squad-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .squad-field-group { display: flex; flex-direction: column; }
+  .squad-field-group.full { grid-column: 1 / -1; }
+  .squad-field {
+    width: 100%;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ml-text);
+    resize: vertical;
+    min-height: 80px;
+    background: #fafafa;
+    transition: border-color 0.2s;
+    flex: 1;
+  }
+  .squad-field:focus { outline: none; border-color: var(--ml-blue); background: white; }
+  .squad-field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ml-muted); margin-bottom: 6px; }
+
+  /* ===== PAINS ===== */
+  .pains-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+  .pain-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr auto;
+    gap: 10px;
+    align-items: start;
+    background: #fafafa;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+    transition: border-color 0.2s;
+  }
+  .pain-row:hover { border-color: #d1d5db; }
+  .pain-row.high { border-left: 4px solid var(--ml-red); }
+  .pain-row.med { border-left: 4px solid #f59e0b; }
+  .pain-row.low { border-left: 4px solid var(--ml-green); }
+  .pain-select {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    background: white;
+    color: var(--ml-text);
+    cursor: pointer;
+    width: 100%;
+  }
+  .pain-select:focus { outline: none; border-color: var(--ml-blue); }
+  .pain-input {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ml-text);
+    background: white;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .pain-input:focus { outline: none; border-color: var(--ml-blue); }
+  .pain-input.desc { min-height: 60px; resize: vertical; }
+  .btn-remove-pain {
+    background: none;
+    border: none;
+    color: #d1d5db;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    margin-top: 2px;
+  }
+  .btn-remove-pain:hover { color: var(--ml-red); background: #fff5f5; }
+  .btn-add-pain {
+    display: flex; align-items: center; gap: 8px;
+    background: #f0f4ff;
+    color: var(--ml-blue);
+    border: 2px dashed #93c5fd;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    justify-content: center;
+  }
+  .btn-add-pain:hover { background: #dbeafe; border-color: var(--ml-blue); }
+  .pain-col-header {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr auto;
+    gap: 10px;
+    padding: 0 14px 6px;
+  }
+  .pain-col-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--ml-muted);
+  }
+
+  /* ===== PRIORITIZATION ===== */
+  .priority-matrix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .matrix-quadrant {
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 120px;
+  }
+  .mq-1 { background: #f0fdf4; border: 1.5px solid var(--ml-green); }
+  .mq-2 { background: #eff6ff; border: 1.5px solid var(--ml-blue); }
+  .mq-3 { background: #fffbeb; border: 1.5px solid #f59e0b; }
+  .mq-4 { background: #fff5f5; border: 1.5px solid #e5e7eb; }
+  .mq-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .mq-1 .mq-title { color: var(--ml-green); }
+  .mq-2 .mq-title { color: var(--ml-blue); }
+  .mq-3 .mq-title { color: #d97706; }
+  .mq-4 .mq-title { color: var(--ml-muted); }
+  .mq-sub { font-size: 11px; color: var(--ml-muted); margin-bottom: 10px; }
+
+  /* ===== ACTION PLAN ===== */
+  .action-table { width: 100%; border-collapse: collapse; }
+  .action-table th {
+    background: var(--ml-dark);
+    color: var(--ml-yellow);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 16px;
+    text-align: left;
+  }
+  .action-table th:first-child { border-radius: 10px 0 0 0; }
+  .action-table th:last-child { border-radius: 0 10px 0 0; }
+  .action-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f2f8;
+    vertical-align: top;
+  }
+  .action-table tr:last-child td { border-bottom: none; }
+  .action-table tr:nth-child(even) td { background: #f8faff; }
+  .status-dot {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-yellow { background: var(--ml-yellow); }
+  .dot-blue { background: var(--ml-blue); }
+  .dot-green { background: var(--ml-green); }
+
+  /* ===== FOOTER ===== */
+  .workshop-footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--ml-muted);
+    font-size: 13px;
+  }
+  .workshop-footer strong { color: var(--ml-dark); }
+
+  /* ===== PRINT ===== */
+  @media print {
+    .toolbar { display: none !important; }
+    .edit-icon-btn { display: none !important; }
+    .page-wrapper { padding-top: 20px; }
+    body { background: white; }
+    .section-card { break-inside: avoid; box-shadow: none; border: 1px solid #e5e7eb; }
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: var(--ml-dark);
+    color: var(--ml-white);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    display: flex; align-items: center; gap: 8px;
+    transform: translateY(80px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+  .toast.show { transform: translateY(0); }
+  .toast-icon { color: var(--ml-yellow); font-size: 16px; }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-brand">
+    <div class="logo-box">ML</div>
+    <span>OTC 1P · AI Use Case Discovery Workshop</span>
+  </div>
+  <div class="toolbar-actions">
+    <span class="edit-mode-badge" id="editBadge">✏️ Modo edición activo</span>
+    <button class="btn btn-outline" id="editToggleBtn" onclick="toggleEdit()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Editar
+    </button>
+    <button class="btn btn-blue" onclick="exportPDF()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar PDF
+    </button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrapper" id="exportArea">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-eyebrow">
+      <span class="tag">OTC 1P · FinOps</span>
+      <span class="tag tag-blue">AI Workshop</span>
+    </div>
+    <div class="cover-title">
+      AI Use Case<br><span>Discovery Workshop</span>
+    </div>
+    <p class="cover-subtitle editable" contenteditable="false">
+      Un espacio práctico y colaborativo para identificar, diseñar y priorizar casos de uso de inteligencia artificial en el proceso OTC 1P — desde la ideación hasta el plan de acción.
+    </p>
+    <div class="cover-meta">
+      <div class="meta-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="editable" contenteditable="false">Fecha: por definir</span>
+      </div>
+      <div class="meta-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="editable" contenteditable="false">Duración: ~3 horas</span>
+      </div>
+      <div class="meta-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="editable" contenteditable="false">Equipo OTC 1P FinOps</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: BIENVENIDA -->
+  <div class="section-card" id="s1">
+    <div class="section-header">
+      <div class="section-number">01</div>
+      <div class="section-title-group">
+        <div class="section-label">Apertura</div>
+        <div class="section-title editable" contenteditable="false">Bienvenida, Objetivos y Reglas del Workshop</div>
+      </div>
+      <span class="section-duration editable" contenteditable="false">⏱ 15 min</span>
+    </div>
+    <div class="agenda-timeline">
+      <div class="agenda-item">
+        <div class="agenda-left"><div class="agenda-dot"></div><div class="agenda-line"></div></div>
+        <div class="agenda-content">
+          <div class="agenda-time">Objetivo</div>
+          <div class="agenda-name editable" contenteditable="false">Meta del día</div>
+          <div class="agenda-desc editable" contenteditable="false">Hoy trabajamos juntos para identificar, diseñar y priorizar un caso de uso concreto de AI en el proceso OTC 1P. La idea es que la sesión no quede en conversación — salimos con un caso elegido, un owner, y los próximos pasos definidos. Vamos a trabajar con lo que tenemos productivo en Celonis como punto de partida de la conversación.</div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-left"><div class="agenda-dot"></div><div class="agenda-line"></div></div>
+        <div class="agenda-content">
+          <div class="agenda-time">Reglas</div>
+          <div class="agenda-name editable" contenteditable="false">Reglas de juego</div>
+          <div class="agenda-desc editable" contenteditable="false">Todas las ideas son válidas · No hay respuestas incorrectas · Lo que se diseña hoy, se ejecuta después</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: DEMO CELONIS -->
+  <div class="section-card" id="s2">
+    <div class="section-header">
+      <div class="section-number">02</div>
+      <div class="section-title-group">
+        <div class="section-label">Demo en vivo</div>
+        <div class="section-title editable" contenteditable="false">Demo Celonis OTC 1P</div>
+      </div>
+      <span class="section-duration editable" contenteditable="false">⏱ 30 min</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value">27.8M</div>
+        <div class="kpi-label">Orders</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">27.9M</div>
+        <div class="kpi-label">Payments</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">17.6M</div>
+        <div class="kpi-label">Shipments</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">22.7M</div>
+        <div class="kpi-label">Invoices</div>
+      </div>
+    </div>
+    <div class="celonis-note editable" contenteditable="false">
+      Mostrar el Control General OTC en Celonis — KPIs de Orders, Payments, Shipments e Invoices. Navegar por las tabs E2E, Dif. Order vs Invoice, y Pending Authorization para evidenciar cómo el equipo ya responde preguntas del día a día con datos.
+    </div>
+
+    <div style="margin-top: 20px; background: #fefce8; border: 1.5px solid #fde68a; border-radius: 12px; padding: 20px;">
+      <div style="font-weight:700; font-size:14px; color:#92400e; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+        <span>☀️</span> Contame: ¿cómo es tu día a día marcando en Celonis?
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="background:white; border-radius:8px; padding:12px; font-size:13px; color:#374151;">
+          <div style="font-weight:700; color:#92400e; margin-bottom:4px;">🖥️ ¿Qué abrís primero cuando entrás?</div>
+          <div style="color:var(--ml-muted);">¿Cuál es la tab o métrica que revisás de entrada? ¿Por qué esa y no otra?</div>
+        </div>
+        <div style="background:white; border-radius:8px; padding:12px; font-size:13px; color:#374151;">
+          <div style="font-weight:700; color:#92400e; margin-bottom:4px;">⏱️ ¿Qué tarea te lleva más tiempo?</div>
+          <div style="color:var(--ml-muted);">¿Hay algo que hacés todos los días que podría ser más rápido o automático?</div>
+        </div>
+        <div style="background:white; border-radius:8px; padding:12px; font-size:13px; color:#374151;">
+          <div style="font-weight:700; color:#92400e; margin-bottom:4px;">🔍 ¿Cuándo salís de Celonis a otro sistema?</div>
+          <div style="color:var(--ml-muted);">¿Qué información buscás fuera del dashboard que no encontrás adentro?</div>
+        </div>
+        <div style="background:white; border-radius:8px; padding:12px; font-size:13px; color:#374151;">
+          <div style="font-weight:700; color:#92400e; margin-bottom:4px;">🚨 ¿Cuándo se te complica el día?</div>
+          <div style="color:var(--ml-muted);">¿Qué tipo de situación o alerta te genera más urgencia y estrés en el proceso?</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p style="font-size:13px; color:var(--ml-muted); margin-bottom:14px;">Preguntas que el equipo se hace frecuentemente y que hoy no tienen respuesta fácil, automática o confiable. Son la puerta de entrada a los pains reales.</p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#fafafa; border:1.5px solid #e5e7eb; border-radius:10px; padding:14px 16px; border-left:4px solid var(--ml-red);">
+          <span style="font-size:18px; flex-shrink:0;">🔴</span>
+          <div>
+            <div style="font-weight:700; font-size:13px; color:var(--ml-dark); margin-bottom:3px;">¿Por qué la orden X no tiene factura todavía, si el pago ya está aprobado?</div>
+            <div style="font-size:12px; color:var(--ml-muted);">Brecha entre pagos aprobados y documentos de factura generados — difícil de diagnosticar sin cruzar múltiples fuentes manualmente.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#fafafa; border:1.5px solid #e5e7eb; border-radius:10px; padding:14px 16px; border-left:4px solid var(--ml-red);">
+          <span style="font-size:18px; flex-shrink:0;">🔴</span>
+          <div>
+            <div style="font-weight:700; font-size:13px; color:var(--ml-dark); margin-bottom:3px;">¿Cuáles de las órdenes con diferencia hoy van a impactar el cierre contable de este mes?</div>
+            <div style="font-size:12px; color:var(--ml-muted);">El equipo detecta diferencias pero no tiene forma rápida de priorizarlas por riesgo contable o monto.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#fafafa; border:1.5px solid #e5e7eb; border-radius:10px; padding:14px 16px; border-left:4px solid #f59e0b;">
+          <span style="font-size:18px; flex-shrink:0;">🟡</span>
+          <div>
+            <div style="font-weight:700; font-size:13px; color:var(--ml-dark); margin-bottom:3px;">¿Estos shipments en "Lost" son realmente pérdida o es un problema de actualización de estado?</div>
+            <div style="font-size:12px; color:var(--ml-muted);">Imposible distinguir rápidamente entre errores de estado y pérdidas reales sin investigación manual caso por caso.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#fafafa; border:1.5px solid #e5e7eb; border-radius:10px; padding:14px 16px; border-left:4px solid #f59e0b;">
+          <span style="font-size:18px; flex-shrink:0;">🟡</span>
+          <div>
+            <div style="font-weight:700; font-size:13px; color:var(--ml-dark); margin-bottom:3px;">¿Cuánto hace que esta autorización SAP está pendiente y quién la tiene que resolver?</div>
+            <div style="font-size:12px; color:var(--ml-muted);">Las pending authorizations no tienen owner claro ni antigüedad visible. El seguimiento depende de quién recuerda preguntar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: PAINS -->
+  <div class="section-card" id="s3">
+    <div class="section-header">
+      <div class="section-number">03</div>
+      <div class="section-title-group">
+        <div class="section-label">Diagnóstico</div>
+        <div class="section-title editable" contenteditable="false">Pains del Proceso y Definiciones para Medir Valor</div>
+      </div>
+      <span class="section-duration editable" contenteditable="false">⏱ 30 min</span>
+    </div>
+    <p style="font-size:14px; color:var(--ml-muted); margin-bottom:20px;" class="editable" contenteditable="false">
+      Listá los pains reales del equipo. Podés agregar tantos como quieran durante la sesión.
+    </p>
+
+    <div class="pain-col-header">
+      <div class="pain-col-label">Prioridad</div>
+      <div class="pain-col-label">Pain / Problema</div>
+      <div class="pain-col-label">Descripción e impacto</div>
+      <div></div>
+    </div>
+
+    <div class="pains-list" id="painsList">
+      <div class="pain-row high">
+        <select class="pain-select" onchange="updatePainClass(this)">
+          <option value="high" selected>🔴 Alta</option>
+          <option value="med">🟡 Media</option>
+          <option value="low">🟢 Baja</option>
+        </select>
+        <input class="pain-input" type="text" value="Reconciliación manual Order vs Invoice" placeholder="Nombre del pain...">
+        <textarea class="pain-input desc" placeholder="Descripción e impacto...">El proceso de detectar y resolver diferencias entre órdenes y facturas consume horas de análisis manual. Alto impacto en cierre contable.</textarea>
+        <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+      </div>
+      <div class="pain-row high">
+        <select class="pain-select" onchange="updatePainClass(this)">
+          <option value="high" selected>🔴 Alta</option>
+          <option value="med">🟡 Media</option>
+          <option value="low">🟢 Baja</option>
+        </select>
+        <input class="pain-input" type="text" value="Detección tardía de anomalías en shipments" placeholder="Nombre del pain...">
+        <textarea class="pain-input desc" placeholder="Descripción e impacto...">Los casos Lost/Stolen/Fraudulent se detectan reactivamente. No hay alertas tempranas por patrón o volumen inusual.</textarea>
+        <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+      </div>
+      <div class="pain-row med">
+        <select class="pain-select" onchange="updatePainClass(this)">
+          <option value="high">🔴 Alta</option>
+          <option value="med" selected>🟡 Media</option>
+          <option value="low">🟢 Baja</option>
+        </select>
+        <input class="pain-input" type="text" value="Pending Authorization SAP sin visibilidad" placeholder="Nombre del pain...">
+        <textarea class="pain-input desc" placeholder="Descripción e impacto...">Las autorizaciones pendientes no tienen owner claro ni antigüedad visible. El seguimiento es 100% manual.</textarea>
+        <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+      </div>
+      <div class="pain-row med">
+        <select class="pain-select" onchange="updatePainClass(this)">
+          <option value="high">🔴 Alta</option>
+          <option value="med" selected>🟡 Media</option>
+          <option value="low">🟢 Baja</option>
+        </select>
+        <input class="pain-input" type="text" value="Sin benchmark automático para detectar picos anómalos" placeholder="Nombre del pain...">
+        <textarea class="pain-input desc" placeholder="Descripción e impacto...">No hay comparación automática entre el volumen actual y el histórico esperado por fecha/sitio. Los picos se detectan tarde.</textarea>
+        <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+      </div>
+      <div class="pain-row med">
+        <select class="pain-select" onchange="updatePainClass(this)">
+          <option value="high">🔴 Alta</option>
+          <option value="med" selected>🟡 Media</option>
+          <option value="low">🟢 Baja</option>
+        </select>
+        <input class="pain-input" type="text" value="Priorización manual de diferencias por riesgo contable" placeholder="Nombre del pain...">
+        <textarea class="pain-input desc" placeholder="Descripción e impacto...">El equipo detecta diferencias pero no tiene forma rápida de ordenarlas por impacto financiero o urgencia de cierre.</textarea>
+        <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+      </div>
+      <div class="pain-row low">
+        <select class="pain-select" onchange="updatePainClass(this)">
+          <option value="high">🔴 Alta</option>
+          <option value="med">🟡 Media</option>
+          <option value="low" selected>🟢 Baja</option>
+        </select>
+        <input class="pain-input" type="text" value="Reportes manuales recurrentes para stakeholders" placeholder="Nombre del pain...">
+        <textarea class="pain-input desc" placeholder="Descripción e impacto...">Los reportes de estado OTC se arman manualmente con frecuencia semanal/mensual. Tiempo considerable sin valor agregado.</textarea>
+        <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+      </div>
+    </div>
+
+    <button class="btn-add-pain" onclick="addPain()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Agregar nuevo pain
+    </button>
+
+    <div style="margin-top: 20px; background: #fafafa; border-radius: 12px; padding: 20px; border: 1.5px dashed #d1d5db;">
+      <div class="section-label" style="margin-bottom: 10px;">¿Cómo medimos el valor del caso?</div>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 13px;">
+        <div>
+          <div style="font-weight:700; color:var(--ml-dark); margin-bottom:4px;">⏱ Tiempo ahorrado</div>
+          <div class="editable" contenteditable="false" style="color:var(--ml-muted);">Horas/persona por semana liberadas del proceso manual</div>
+        </div>
+        <div>
+          <div style="font-weight:700; color:var(--ml-dark); margin-bottom:4px;">💰 Impacto financiero</div>
+          <div class="editable" contenteditable="false" style="color:var(--ml-muted);">Reducción de errores, diferencias o pérdidas detectables</div>
+        </div>
+        <div>
+          <div style="font-weight:700; color:var(--ml-dark); margin-bottom:4px;">📈 Mejora de proceso</div>
+          <div class="editable" contenteditable="false" style="color:var(--ml-muted);">Velocidad de detección, cobertura, reducción de reclamos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: HACKATHON -->
+  <div class="section-card" id="s4">
+    <div class="section-header">
+      <div class="section-number">04</div>
+      <div class="section-title-group">
+        <div class="section-label">AI Hackatón</div>
+        <div class="section-title editable" contenteditable="false">Diseño del Caso de Uso</div>
+      </div>
+      <span class="section-duration editable" contenteditable="false">⏱ 45 min</span>
+    </div>
+    <p style="font-size:14px; color:var(--ml-muted); margin-bottom:20px;" class="editable" contenteditable="false">
+      Diseñen UN caso de uso completo a partir de los pains identificados. Completar los campos durante la dinámica.
+    </p>
+    <div class="squad-card">
+      <div class="squad-header">
+        <div class="squad-badge">⚡</div>
+        <div>
+          <div class="squad-name">Diseño del Caso de Uso</div>
+          <div style="font-size:13px; color:var(--ml-muted);">Trabajen juntos para completar cada campo</div>
+        </div>
+      </div>
+      <div class="squad-fields-grid">
+        <div class="squad-field-group full">
+          <div class="squad-field-label">Nombre del caso de uso</div>
+          <input type="text" class="squad-field" style="min-height:unset; height:42px; resize:none;" placeholder="Ej: Agente de reconciliación automática Order-Invoice con alertas de riesgo contable...">
+        </div>
+        <div class="squad-field-group">
+          <div class="squad-field-label">Pain que resuelve</div>
+          <textarea class="squad-field" placeholder="¿Cuál de los pains listados ataca principalmente? ¿Por qué es el más importante?"></textarea>
+        </div>
+        <div class="squad-field-group">
+          <div class="squad-field-label">¿Cómo aplica AI?</div>
+          <textarea class="squad-field" placeholder="¿Qué tipo de AI? (clasificador, agente, predictor, generador de insights...) ¿Cómo funciona el flujo?"></textarea>
+        </div>
+        <div class="squad-field-group">
+          <div class="squad-field-label">Input de datos</div>
+          <textarea class="squad-field" placeholder="¿Qué datos necesita? ¿Ya están disponibles en Celonis o SAP? ¿Hay brechas?"></textarea>
+        </div>
+        <div class="squad-field-group">
+          <div class="squad-field-label">Output / Acción esperada</div>
+          <textarea class="squad-field" placeholder="¿Qué produce el sistema? ¿Alerta, reporte, decisión automática, sugerencia al usuario?"></textarea>
+        </div>
+        <div class="squad-field-group">
+          <div class="squad-field-label">Métrica de éxito</div>
+          <textarea class="squad-field" placeholder="¿Cómo medimos que funcionó? ¿Cuál es el baseline hoy y el target con AI?"></textarea>
+        </div>
+        <div class="squad-field-group">
+          <div class="squad-field-label">Riesgos o dependencias</div>
+          <textarea class="squad-field" placeholder="¿Qué podría frenar este caso? ¿Hay dependencias de otros equipos, datos o sistemas?"></textarea>
+        </div>
+        <div class="squad-field-group full">
+          <div class="squad-field-label">¿Por qué ahora? — Argumento para priorizarlo</div>
+          <textarea class="squad-field" style="min-height:60px;" placeholder="¿Qué hace que este caso sea urgente o estratégico en este momento para OTC 1P?"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: PRIORIZACION -->
+  <div class="section-card" id="s5">
+    <div class="section-header">
+      <div class="section-number">05</div>
+      <div class="section-title-group">
+        <div class="section-label">Decisión</div>
+        <div class="section-title editable" contenteditable="false">Priorización del Caso de Uso Ganador</div>
+      </div>
+      <span class="section-duration editable" contenteditable="false">⏱ 20 min</span>
+    </div>
+    <p style="font-size:14px; color:var(--ml-muted); margin-bottom:20px;" class="editable" contenteditable="false">
+      Votar y posicionar los 3 casos según impacto y esfuerzo. El cuadrante superior izquierdo es el ganador ideal.
+    </p>
+    <div class="priority-matrix">
+      <div class="matrix-quadrant mq-1">
+        <div class="mq-title">⭐ Alto impacto · Bajo esfuerzo</div>
+        <div class="mq-sub">Quick wins — priorizar primero</div>
+        <div class="editable" contenteditable="false" style="font-size:13px; color:#374151; min-height:40px;">Completar con el caso ganador después de la votación...</div>
+      </div>
+      <div class="matrix-quadrant mq-2">
+        <div class="mq-title">🔵 Alto impacto · Alto esfuerzo</div>
+        <div class="mq-sub">Grandes apuestas — planificar bien</div>
+        <div class="editable" contenteditable="false" style="font-size:13px; color:#374151; min-height:40px;">Completar durante la sesión...</div>
+      </div>
+      <div class="matrix-quadrant mq-3">
+        <div class="mq-title">🟡 Bajo impacto · Bajo esfuerzo</div>
+        <div class="mq-sub">Oportunistas — si hay capacidad</div>
+        <div class="editable" contenteditable="false" style="font-size:13px; color:#374151; min-height:40px;">Completar durante la sesión...</div>
+      </div>
+      <div class="matrix-quadrant mq-4">
+        <div class="mq-title">⬜ Bajo impacto · Alto esfuerzo</div>
+        <div class="mq-sub">Evitar o descartar</div>
+        <div class="editable" contenteditable="false" style="font-size:13px; color:#374151; min-height:40px;">Completar durante la sesión...</div>
+      </div>
+    </div>
+    <div style="margin-top:20px; background:#fffde7; border-radius:10px; padding:16px; border-left:4px solid var(--ml-yellow);">
+      <strong style="font-size:13px;">🏆 Caso Ganador:</strong>
+      <div class="editable" contenteditable="false" style="font-size:14px; margin-top:6px; color:var(--ml-dark);">A completar luego de la votación del equipo — nombre del caso, squad responsable y fundamento de la elección.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: PLAN DE ACCION -->
+  <div class="section-card" id="s6">
+    <div class="section-header">
+      <div class="section-number">06</div>
+      <div class="section-title-group">
+        <div class="section-label">Cierre</div>
+        <div class="section-title editable" contenteditable="false">Plan del Caso Ganador y Próximos Pasos</div>
+      </div>
+      <span class="section-duration editable" contenteditable="false">⏱ 20 min</span>
+    </div>
+    <table class="action-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Acción</th>
+          <th>Owner</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700; color:var(--ml-blue);">1</td>
+          <td class="editable" contenteditable="false">Documentar el caso ganador (problema, solución, scope)</td>
+          <td class="editable" contenteditable="false">Por definir</td>
+          <td class="editable" contenteditable="false">Semana 1</td>
+          <td><span class="status-dot"><span class="dot dot-yellow"></span>Pendiente</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:var(--ml-blue);">2</td>
+          <td class="editable" contenteditable="false">Alinear con tech / data sobre viabilidad del prototipo</td>
+          <td class="editable" contenteditable="false">Por definir</td>
+          <td class="editable" contenteditable="false">Semana 1–2</td>
+          <td><span class="status-dot"><span class="dot dot-yellow"></span>Pendiente</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:var(--ml-blue);">3</td>
+          <td class="editable" contenteditable="false">Definir datos disponibles en Celonis para el caso</td>
+          <td class="editable" contenteditable="false">Por definir</td>
+          <td class="editable" contenteditable="false">Semana 2</td>
+          <td><span class="status-dot"><span class="dot dot-yellow"></span>Pendiente</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:var(--ml-blue);">4</td>
+          <td class="editable" contenteditable="false">Primera demo del prototipo con el equipo OTC</td>
+          <td class="editable" contenteditable="false">Por definir</td>
+          <td class="editable" contenteditable="false">Semana 3–4</td>
+          <td><span class="status-dot"><span class="dot dot-blue"></span>Por iniciar</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:var(--ml-blue);">5</td>
+          <td class="editable" contenteditable="false">Agregar acción aquí</td>
+          <td class="editable" contenteditable="false">—</td>
+          <td class="editable" contenteditable="false">—</td>
+          <td><span class="status-dot"><span class="dot dot-yellow"></span>Pendiente</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 24px; background: var(--ml-dark); border-radius: 12px; padding: 24px; color:white;">
+      <div style="font-family:'Unbounded',sans-serif; font-size:15px; font-weight:700; color:var(--ml-yellow); margin-bottom:12px;">🎯 Compromisos de cierre</div>
+      <div class="editable" contenteditable="false" style="font-size:14px; line-height:1.7; color:rgba(255,255,255,0.8);">
+        Al salir de esta sesión, cada participante conoce: (1) el caso de uso elegido, (2) quién es el owner, (3) cuándo es el próximo checkpoint y (4) qué necesitan para avanzar esta semana.
+      </div>
+    </div>
+  </div>
+
+  <div class="workshop-footer">
+    <strong>Mercado Libre · OTC 1P FinOps</strong> · AI Use Case Discovery Workshop<br>
+    Documento generado con Claude — editable y exportable a PDF
+  </div>
+
+</div><!-- end page-wrapper -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">Cambios guardados</span>
+</div>
+
+<script>
+  let editMode = false;
+
+  function toggleEdit() {
+    editMode = !editMode;
+    document.body.classList.toggle('edit-mode', editMode);
+    document.getElementById('editBadge').classList.toggle('active', editMode);
+    const btn = document.getElementById('editToggleBtn');
+
+    const editables = document.querySelectorAll('.editable');
+    editables.forEach(el => {
+      el.contentEditable = editMode ? 'true' : 'false';
+    });
+
+    if (editMode) {
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Guardar`;
+      btn.className = 'btn btn-primary';
+      showToast('Modo edición activado — click en cualquier texto para editar');
+    } else {
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar`;
+      btn.className = 'btn btn-outline';
+      showToast('¡Cambios guardados correctamente!');
+    }
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function exportPDF() {
+    // Disable edit mode first
+    if (editMode) toggleEdit();
+
+    showToast('Generando PDF...');
+    const toolbar = document.querySelector('.toolbar');
+    toolbar.style.display = 'none';
+
+    const element = document.getElementById('exportArea');
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: 'Workshop_AI_OTC1P.pdf',
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#f0f2f8'
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      toolbar.style.display = 'flex';
+      showToast('PDF exportado exitosamente ✓');
+    }).catch(() => {
+      toolbar.style.display = 'flex';
+      showToast('Error al exportar. Intentá con Ctrl+P');
+    });
+  }
+
+  // Keyboard shortcut: Ctrl+E to toggle edit
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      toggleEdit();
+    }
+  });
+
+  function addPain() {
+    const list = document.getElementById('painsList');
+    const row = document.createElement('div');
+    row.className = 'pain-row med';
+    row.innerHTML = `
+      <select class="pain-select" onchange="updatePainClass(this)">
+        <option value="high">🔴 Alta</option>
+        <option value="med" selected>🟡 Media</option>
+        <option value="low">🟢 Baja</option>
+      </select>
+      <input class="pain-input" type="text" placeholder="Nombre del pain..." value="">
+      <textarea class="pain-input desc" placeholder="Descripción e impacto..."></textarea>
+      <button class="btn-remove-pain" onclick="removePain(this)" title="Eliminar">✕</button>
+    `;
+    list.appendChild(row);
+    row.querySelector('input').focus();
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function removePain(btn) {
+    const row = btn.closest('.pain-row');
+    const list = document.getElementById('painsList');
+    if (list.querySelectorAll('.pain-row').length <= 1) {
+      showToast('Debe quedar al menos un pain en la lista');
+      return;
+    }
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(20px)';
+    row.style.transition = 'all 0.2s';
+    setTimeout(() => row.remove(), 200);
+  }
+
+  function updatePainClass(select) {
+    const row = select.closest('.pain-row');
+    row.className = 'pain-row ' + select.value;
+  }
+</script>
+</body>
+</html>
